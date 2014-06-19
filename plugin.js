@@ -1,5 +1,7 @@
 var util = require('util');
 
+var checkCommit;
+
 module.exports = function (poppins) {
   var plugins = poppins.plugins;
 
@@ -7,7 +9,7 @@ module.exports = function (poppins) {
     throw new Error('poppins-check-commit requires poppins-pr-checklist to be loaded first');
   }
 
-  plugins.checkCommit = {
+  checkCommit = plugins.checkCommit = {
     message: "PR's commit messages follow the [commit message format]" +
         "(https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit-message-format)",
 
@@ -24,35 +26,37 @@ module.exports = function (poppins) {
     },
 
     check: getFeedbackForMessage,
+
+    maxLength: 100,
+    pattern: /^(?:fixup!\s*)?(\w*)(\(([\w\$\.\-\*/]*)\))?\: (.*)$/,
+    types: [
+      'feat',
+      'fix',
+      'docs',
+      'style',
+      'refactor',
+      'perf',
+      'test',
+      'chore',
+      'revert'
+    ],
   };
+
 
   plugins.prChecklist.checks.push(plugins.checkCommit);
 };
 
 
-var MAX_LENGTH = 100;
-var PATTERN = /^(?:fixup!\s*)?(\w*)(\(([\w\$\.\-\*/]*)\))?\: (.*)$/;
-var TYPES = [
-  'feat',
-  'fix',
-  'docs',
-  'style',
-  'refactor',
-  'perf',
-  'test',
-  'chore',
-  'revert'
-];
 
 
 function getFeedbackForMessage (message) {
   message = message.split('\n')[0];
 
-  if (message.length > MAX_LENGTH) {
-    return util.format('`%s` is longer than %d characters', message, MAX_LENGTH);
+  if (message.length > checkCommit.maxLength) {
+    return util.format('`%s` is longer than %d characters', message, checkCommit.maxLength);
   }
 
-  var match = PATTERN.exec(message);
+  var match = checkCommit.pattern.exec(message);
 
   if (!match) {
     return util.format('`%s` does not match `<type>(<scope>): <subject>`', message);
@@ -60,9 +64,9 @@ function getFeedbackForMessage (message) {
 
   var type = match[1];
 
-  if (TYPES.indexOf(type) === -1) {
+  if (checkCommit.types.indexOf(type) === -1) {
     return util.format('`%s` is not an allowed type; allowed types are %s.',
-        type, TYPES.map(backtick).join(', '));
+        type, checkCommit.types.map(backtick).join(', '));
   }
 
   return '';

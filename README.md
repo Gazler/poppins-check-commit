@@ -33,18 +33,45 @@ module.exports = function (poppins) {
 
 ## Options
 
-Options are available on `popins.plugins.checkCommit`.
+Options are available on `poppins.plugins.checkCommit`.
 They should be fairly self-explanatory if you read [the plugin's source](https://github.com/btford/poppins-check-commit/blob/master/plugin.js).
 
-### `popins.plugins.checkCommit.message`
+### `poppins.plugins.checkCommit.message`
 String.
 Defaults to `"PR's commit messages follow the [commit message format](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#)"`
 
-### `popins.plugins.checkCommit.condition`
+### `poppins.plugins.checkCommit.maxLength`
+Integer.
+Defaults to 100 - max length of commit subject.
+
+### `poppins.plugins.checkCommit.pattern`
+Regular Expression
+Defaults to `/^(?:fixup!\s*)?(\w*)(\(([\w\$\.\-\*/]*)\))?\: (.*)$/`
+
+### `poppins.plugins.checkCommit.types`
+Array.
+Defaults to:
+
+    [
+      'feat',
+      'fix',
+      'docs',
+      'style',
+      'refactor',
+      'perf',
+      'test',
+      'chore',
+      'revert'
+    ]
+
+These are the valid types for the commit subject.
+
+
+### `poppins.plugins.checkCommit.condition`
 Function.
 Returns promise that resolves to a bool as to whether or not the PR follows the guidelines.
 
-### `popins.plugins.checkCommit.check`
+### `poppins.plugins.checkCommit.check`
 Function.
 Run on each commit to determine its validity.
 
